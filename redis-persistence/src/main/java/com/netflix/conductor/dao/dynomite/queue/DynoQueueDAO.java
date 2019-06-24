@@ -146,14 +146,14 @@ public class DynoQueueDAO implements QueueDAO {
 				.collect(Collectors.toList());
         queues.get(queueName).push(msgs);
 
-        try {
+        //try {
             for (Message msg : msgs) {
-                ProducerRecord<Long, String> record = new ProducerRecord<Long, String>("", msg.getPayload());
-                RecordMetadata metadata = producer.send(record).get();
+                ProducerRecord<Long, String> record = new ProducerRecord<Long, String>("test", msg.getPayload());
+                producer.send(record);
             }
-        } catch (Exception e) {
+        /*} catch (Exception e) {
             // TODO: do smth
-        }
+        }*/
     }
 
     @Override
@@ -166,12 +166,12 @@ public class DynoQueueDAO implements QueueDAO {
         msg.setTimeout(offsetTimeInSecond, TimeUnit.SECONDS);
         queue.push(Collections.singletonList(msg));
 
-        try {
-            ProducerRecord<Long, String> record = new ProducerRecord<Long, String>("", msg.getPayload());
-            RecordMetadata metadata = producer.send(record).get();
-        } catch (Exception e) {
+        //try {
+            ProducerRecord<Long, String> record = new ProducerRecord<Long, String>("test", msg.getPayload());
+            producer.send(record);
+        /*} catch (Exception e) {
             // TODO: do smth
-        }
+        }*/
 
         return true;
     }
