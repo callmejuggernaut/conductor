@@ -1,0 +1,23 @@
+dependencies {
+	
+	compile project(':conductor-common')
+	compile project(':conductor-core')
+
+	compile 'com.amazonaws:aws-java-sdk-sqs:latest.release'
+	compile "com.google.inject:guice:${revGuice}"
+
+	compile "net.thisptr:jackson-jq:${revJq}"
+
+	compile "com.sun.jersey.contribs.jersey-oauth:oauth-client:${revOauthClient}"
+	compile "com.sun.jersey.contribs.jersey-oauth:oauth-signature:${revOauthSignature}"
+
+	compile "io.nats:java-nats-streaming:${revNatsStreaming}"
+
+	compileOnly "javax.ws.rs:jsr311-api:${revJsr311Api}"
+	compile "io.swagger:swagger-jaxrs:${revSwagger}"
+
+	compile "org.apache.kafka:kafka-clients:2.2.0"
+
+	testCompile "org.eclipse.jetty:jetty-server:${revJetteyServer}"
+	testCompile "org.eclipse.jetty:jetty-servlet:${revJettyServlet}"
+}

@@ -1,0 +1,17 @@
+dependencies {
+
+    compile project(':conductor-core')
+    compile "redis.clients:jedis:${revJedis}"
+    compile "com.google.inject:guice:${revGuice}"
+    compile "com.netflix.dyno-queues:dyno-queues-redis:${revDynoQueues}"
+
+    //In memory
+    compile "org.rarefiedredis.redis:redis-java:${revRarefiedRedis}"
+
+    // https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients
+    compile group: 'org.apache.kafka', name: 'kafka-clients', version: '2.2.0'
+    // https://mvnrepository.com/artifact/org.apache.kafka/kafka
+    compile group: 'org.apache.kafka', name: 'kafka_2.12', version: '2.2.0'
+
+    testCompile project(':conductor-core').sourceSets.test.output
+}
