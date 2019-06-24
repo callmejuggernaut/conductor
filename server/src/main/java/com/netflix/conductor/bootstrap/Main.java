@@ -39,7 +39,31 @@ public class Main {
 
     private static final int EMBEDDED_ES_INIT_TIME = 5000;
 
+//    public static Producer<Long, String> createProducer() {
+//        Properties props = new Properties();
+//        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "10.97.18.46:9092");
+//        props.put(ProducerConfig.CLIENT_ID_CONFIG, "NetflixConductorProducer");
+//        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, LongSerializer.class.getName());
+//        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+//        //props.put(ProducerConfig.PARTITIONER_CLASS_CONFIG, CustomPartitioner.class.getName());
+//        return new KafkaProducer<>(props);
+//    }
+
     public static void main(String[] args) throws Exception {
+//        final Producer<Long, String> producer = createProducer();
+//        long time = System.currentTimeMillis();
+//
+//        try {
+//            final ProducerRecord<Long, String> record = new ProducerRecord<>("test", time, "Hello Mom " + time);
+//            RecordMetadata metadata = producer.send(record).get();
+//
+//            long elapsedTime = System.currentTimeMillis() - time;
+//            System.out.printf("sent record(key=%s value=%s) meta(partition=%d, offset=%d) time=%d\n",
+//                    record.key(), record.value(), metadata.partition(), metadata.offset(), elapsedTime);
+//        } finally {
+//            producer.flush();
+//            producer.close();
+//        }
 
         loadConfigFile(args.length > 0 ? args[0] : System.getenv("CONDUCTOR_CONFIG_FILE"));
 

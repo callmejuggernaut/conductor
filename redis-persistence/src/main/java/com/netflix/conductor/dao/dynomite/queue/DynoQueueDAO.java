@@ -25,7 +25,6 @@ import com.netflix.dyno.queues.redis.RedisDynoQueue;
 import com.netflix.dyno.queues.redis.RedisQueues;
 import com.netflix.dyno.queues.shard.DynoShardSupplier;
 import org.apache.kafka.clients.producer.*;
-import org.apache.kafka.common.serialization.LongSerializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,23 +119,37 @@ public class DynoQueueDAO implements QueueDAO {
         logger.info("DynoQueueDAO initialized with prefix " + prefix + "!");
     }
 
-    public static Producer<Long, String> createProducer() {
+    private static Producer<String, String> createProducer() {
         Properties props = new Properties();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "10.97.18.46:9092");
-        props.put(ProducerConfig.CLIENT_ID_CONFIG, "client1");
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, LongSerializer.class.getName());
+        props.put(ProducerConfig.CLIENT_ID_CONFIG, "NetflixConductorProducer");
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         //props.put(ProducerConfig.PARTITIONER_CLASS_CONFIG, CustomPartitioner.class.getName());
         return new KafkaProducer<>(props);
     }
 
-    Producer<Long, String> producer = createProducer();
+    private void produceToKafka(Message message) {
+        final Producer<String, String> producer = createProducer();
+
+        try {
+            final ProducerRecord<String, String> record = new ProducerRecord<>("test", message.getId(), message.getPayload());
+            RecordMetadata metadata = producer.send(record).get();
+        } catch (Exception e) {
+            throw new InternalError(e.getMessage());
+        } finally {
+            producer.flush();
+            producer.close();
+        }
+    }
 
     @Override
     public void push(String queueName, String id, long offsetTimeInSecond) {
         Message msg = new Message(id, null);
         msg.setTimeout(offsetTimeInSecond, TimeUnit.SECONDS);
         queues.get(queueName).push(Collections.singletonList(msg));
+
+        produceToKafka(msg);
     }
 
     @Override
@@ -146,14 +159,9 @@ public class DynoQueueDAO implements QueueDAO {
 				.collect(Collectors.toList());
         queues.get(queueName).push(msgs);
 
-        //try {
-            for (Message msg : msgs) {
-                ProducerRecord<Long, String> record = new ProducerRecord<Long, String>("test", msg.getPayload());
-                producer.send(record);
-            }
-        /*} catch (Exception e) {
-            // TODO: do smth
-        }*/
+        for (com.netflix.conductor.core.events.queue.Message msg : messages) {
+            produceToKafka(new Message(msg.getId(), msg.getPayload()));
+        }
     }
 
     @Override
@@ -166,12 +174,7 @@ public class DynoQueueDAO implements QueueDAO {
         msg.setTimeout(offsetTimeInSecond, TimeUnit.SECONDS);
         queue.push(Collections.singletonList(msg));
 
-        //try {
-            ProducerRecord<Long, String> record = new ProducerRecord<Long, String>("test", msg.getPayload());
-            producer.send(record);
-        /*} catch (Exception e) {
-            // TODO: do smth
-        }*/
+        produceToKafka(msg);
 
         return true;
     }
