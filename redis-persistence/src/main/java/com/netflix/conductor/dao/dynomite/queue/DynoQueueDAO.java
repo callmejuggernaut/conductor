@@ -133,7 +133,7 @@ public class DynoQueueDAO implements QueueDAO {
         final Producer<String, String> producer = createProducer();
 
         try {
-            final ProducerRecord<String, String> record = new ProducerRecord<>("test", message.getId(), message.getPayload());
+            final ProducerRecord<String, String> record = new ProducerRecord<>("test", null, message.getId());
             RecordMetadata metadata = producer.send(record).get();
         } catch (Exception e) {
             throw new InternalError(e.getMessage());
@@ -149,7 +149,9 @@ public class DynoQueueDAO implements QueueDAO {
         msg.setTimeout(offsetTimeInSecond, TimeUnit.SECONDS);
         queues.get(queueName).push(Collections.singletonList(msg));
 
-        produceToKafka(msg);
+        if(!queueName.startsWith("_")) {
+            produceToKafka(msg);
+        }
     }
 
     @Override
@@ -159,8 +161,10 @@ public class DynoQueueDAO implements QueueDAO {
 				.collect(Collectors.toList());
         queues.get(queueName).push(msgs);
 
-        for (com.netflix.conductor.core.events.queue.Message msg : messages) {
-            produceToKafka(new Message(msg.getId(), msg.getPayload()));
+        if(!queueName.startsWith("_")) {
+            for (com.netflix.conductor.core.events.queue.Message msg : messages) {
+                produceToKafka(new Message(msg.getId(), msg.getPayload()));
+            }
         }
     }
 
@@ -174,7 +178,9 @@ public class DynoQueueDAO implements QueueDAO {
         msg.setTimeout(offsetTimeInSecond, TimeUnit.SECONDS);
         queue.push(Collections.singletonList(msg));
 
-        produceToKafka(msg);
+        if(!queueName.startsWith("_")) {
+            produceToKafka(msg);
+        }
 
         return true;
     }
