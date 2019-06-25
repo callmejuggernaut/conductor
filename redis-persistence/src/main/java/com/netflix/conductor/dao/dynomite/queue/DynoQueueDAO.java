@@ -119,7 +119,10 @@ public class DynoQueueDAO implements QueueDAO {
         logger.info("DynoQueueDAO initialized with prefix " + prefix + "!");
     }
 
-    private static Producer<String, String> createProducer() {
+    private Producer<String, String> createProducer() {
+//        String brokers = this.config.getProperty("kafka.brokers", "10.97.18.46:9092");
+//        String clientId = this.config.getProperty("kafka.client_id", "NetflixConductorProducer");
+
         Properties props = new Properties();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "10.97.18.46:9092");
         props.put(ProducerConfig.CLIENT_ID_CONFIG, "NetflixConductorProducer");
